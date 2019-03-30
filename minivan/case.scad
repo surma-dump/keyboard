@@ -6,6 +6,8 @@ case_height = 19;
 
 buffer = 2*notch;
 
+gap_closer = 1e-3;
+
 module box_joints(w, h, n = 100) {
     for (i = [0:n]) {
         translate([i * 2 * w, 0]) {
@@ -16,7 +18,7 @@ module box_joints(w, h, n = 100) {
 
 module bottom_plate_south_joints() {
     // Bottom box joints
-    translate([buffer, -d+1e-4])
+    translate([buffer, -d+gap_closer])
         intersection() {
             square([width - 2*buffer, d]);
             box_joints(notch, d);
@@ -78,7 +80,7 @@ module north_plate() {
             translate([-d, 0])
                 square([d, case_height]);
         }
-        translate([width + d, 0])
+        translate([width + d - gap_closer, 0])
             intersection() {
                 translate([0, notch])
                     rotate([0, 0, 90])
@@ -103,7 +105,7 @@ module south_plate() {
             translate([-d, 0])
                 square([d, case_height]);
         }
-        translate([width + d, 0])
+        translate([width + d - gap_closer, 0])
             intersection() {
                 translate([0, notch])
                     rotate([0, 0, 90])
