@@ -1,8 +1,9 @@
 width = 244.5;
 height = 77.75;
 d = 3;
-notch = 5;
-case_height = 19;
+notch = 3;
+bottom_gap = d;
+case_height = 19 + bottom_gap;
 
 buffer = 2*notch;
 
@@ -17,7 +18,6 @@ module box_joints(w, h, n = 100) {
 }
 
 module bottom_plate_south_joints() {
-    // Bottom box joints
     translate([buffer, -d+gap_closer])
         intersection() {
             square([width - 2*buffer, d]);
@@ -70,8 +70,8 @@ module north_plate() {
     union() {
         difference() {
             square([width, case_height]);
-            translate([0, -height])
-                bottom_plate();
+            translate([0, -height+bottom_gap])
+                bottom_plate_north_joints();
         }
         intersection() {
             translate([0, 0])
@@ -95,8 +95,8 @@ module south_plate() {
     union() {
         difference() {
             square([width, case_height]);
-            translate([0, case_height])
-                bottom_plate();
+            translate([0, case_height-bottom_gap])
+                bottom_plate_south_joints();
         }
          intersection() {
             translate([0, 0])
@@ -120,8 +120,8 @@ module east_plate() {
     union() {
         difference() {
             square([case_height, height]);
-            translate([-width, 0])
-                bottom_plate();
+            translate([-width+bottom_gap, 0])
+                bottom_plate_east_joints();
         }
         intersection() {
             translate([0, height])
@@ -131,7 +131,7 @@ module east_plate() {
         }
         translate([0, -d])
             intersection() {
-                translate([notch, 0])
+                translate([-ceil(case_height / notch)*notch + (case_height % (2*notch)) - notch, 0])
                     box_joints(notch, d);
                 translate([0, 0])
                     square([case_height, d]);
@@ -143,11 +143,11 @@ module west_plate() {
     union() {
         difference() {
             square([case_height, height]);
-            translate([case_height, 0])
-                bottom_plate();
+            translate([case_height-bottom_gap, 0])
+                bottom_plate_west_joints();
         }
         intersection() {
-            translate([0, height])
+            translate([-ceil(case_height / notch)*notch + (case_height % (2*notch)), height])
                 box_joints(notch, d);
             translate([0, height])
                 square([case_height, d]);
