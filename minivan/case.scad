@@ -42,19 +42,25 @@ gap_closer = 1e-3;
 function rem(n, d) = floor(n / d) * d;
 
 module bottom_plate() {
-    translate([d, d, bottom_gap])
-        cube([width, height, d]);
-    notch_line([buffer + d, 0, bottom_gap], [1, 0, 0], d, notch, width - 2*buffer);
-    notch_line([buffer + d, height + d, bottom_gap], [1, 0, 0], d, notch, width - 2*buffer);
-    notch_line([0, buffer + d, bottom_gap], [0, 1, 0], d, notch, height - 2*buffer);
-    notch_line([width + d, buffer + d, bottom_gap], [0, 1, 0], d, notch, height - 2*buffer);
+    difference() {
+        union() {
+            translate([d, d, bottom_gap])
+                cube([width, height, d]);
+            notch_line([buffer + d, 0, bottom_gap], [1, 0, 0], d, notch, width - 2*buffer);
+            notch_line([buffer + d, height + d, bottom_gap], [1, 0, 0], d, notch, width - 2*buffer);
+            notch_line([0, buffer + d, bottom_gap], [0, 1, 0], d, notch, height - 2*buffer);
+            notch_line([width + d, buffer + d, bottom_gap], [0, 1, 0], d, notch, height - 2*buffer);
+        }
+        crystal_cutout();
+        usb_cutout();
+        reset_cutout();
+    }
 }
 
 module notch_line(origin, dir, d, notch, length, inverted = false) {
     translate(origin)
         intersection() {
             difference() {
-                // <3 beanielovespooch <3
                 if(inverted)
                     cube(d * ([1, 1, 1] - dir) + dir * length);
                 for(i = [0:floor(length/(2*notch))]) {
@@ -115,13 +121,13 @@ module usb_cutout() {
 }
 
 module crystal_cutout() {
-    translate([crystal_left_x + d, crystal_top_y + d, d])
-        cube([crystal_width, crystal_height, d]);
+    translate([crystal_left_x + d, crystal_top_y, d])
+        cube([crystal_width, crystal_height + d, d]);
 }
 
 module reset_cutout() {
-    translate([reset_left_x + d, reset_top_y + d, d])
-        cube([reset_width, reset_height, d]);
+    translate([reset_left_x, reset_top_y + d, d])
+        cube([reset_width + d, reset_height, d]);
 }
 
 difference() {
@@ -133,6 +139,4 @@ difference() {
         bottom_plate();
     }
     usb_cutout();
-    crystal_cutout();
-    reset_cutout();
 }
