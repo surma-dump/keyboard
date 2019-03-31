@@ -1,7 +1,7 @@
 width = 244.5;
 height = 77.75;
 d = 3;
-notch = 3;
+notch = 5;
 bottom_gap = d;
 case_height = 19 + bottom_gap;
 
@@ -9,60 +9,34 @@ buffer = 2*notch;
 
 gap_closer = 1e-3;
 
-module box_joints(w, h, n = 100) {
-    for (i = [0:n]) {
-        translate([i * 2 * w, 0]) {
-            square([w, h]);
-        }
-    }    
+module box_joints(l, vertical = false) {
+    num_notches = floor(l / (2*notch));
+    intersection() {
+        for (i = [0:num_notches]) {
+            translate(vertical ? [0, i*2*notch] : [i*2*notch, 0] ) 
+                square(vertical ? [d, notch] : [notch, d]);
+        }    
+        square(vertical ? [d, l] : [l, d]);
+    }
 }
 
-module bottom_plate_south_joints() {
-    translate([buffer, -d+gap_closer])
-        intersection() {
-            square([width - 2*buffer, d]);
-            box_joints(notch, d);
-        }
-}
-
-module bottom_plate_north_joints() {
-    translate([width, height + d])
-        mirror([-1, 0, 0])
-            translate([buffer, -d])
-                intersection() {
-                    square([width - 2*buffer, d]);
-                    box_joints(notch, d);
-                }
-}
-
-module bottom_plate_west_joints() {
-    translate([-d, buffer])
-        intersection() {
-            square([d, height - 2*buffer]);
-            translate([0, height - 2*buffer])
-                rotate([0, 0, -90])
-                    box_joints(notch, d);
-        }
-}
-
-module bottom_plate_east_joints() {
-    translate([width, height - buffer])
-    mirror([0, 1, 0])
-        intersection() {
-            square([d, height - 2*buffer]);
-            translate([0, height - 2*buffer])
-                rotate([0, 0, -90])
-                    box_joints(notch, d);
-        }
-}
 
 module bottom_plate() {
     union() {
         square([width, height]);
-        bottom_plate_south_joints();
-        bottom_plate_north_joints();
-        bottom_plate_east_joints();
-        bottom_plate_west_joints();
+        // south
+        translate([buffer, -d + gap_closer])
+            box_joints(width - 2*buffer, false);
+        // north
+        translate([buffer, height - gap_closer])
+            box_joints(width - 2*buffer, false);
+        // west
+        translate([-d + gap_closer, buffer])
+            box_joints(height - 2*buffer, true);
+        // east
+        translate([width - gap_closer, buffer])
+            box_joints(height - 2*buffer, true);
+
     }
 }
 
@@ -70,96 +44,49 @@ module north_plate() {
     union() {
         difference() {
             square([width, case_height]);
-            translate([0, -height+bottom_gap])
-                bottom_plate_north_joints();
+            translate([buffer, bottom_gap])
+               box_joints(width - 2*buffer, false);
         }
-        intersection() {
-            translate([0, 0])
-                rotate([0, 0, 90])
-                    box_joints(notch, d);
-            translate([-d, 0])
+        translate([-d, 0])
+            box_joints(case_height, true);
+        translate([width, 0])
+            difference() {
                 square([d, case_height]);
-        }
-        translate([width + d - gap_closer, 0])
-            intersection() {
-                translate([0, notch])
-                    rotate([0, 0, 90])
-                        box_joints(notch, d);
-                translate([-d, 0])
-                    square([d, case_height]);
+                box_joints(case_height, true);
             }
     }
 }
 
 module south_plate() {
-    union() {
-        difference() {
-            square([width, case_height]);
-            translate([0, case_height-bottom_gap])
-                bottom_plate_south_joints();
-        }
-         intersection() {
-            translate([0, 0])
-                rotate([0, 0, 90])
-                    box_joints(notch, d);
-            translate([-d, 0])
-                square([d, case_height]);
-        }
-        translate([width + d - gap_closer, 0])
-            intersection() {
-                translate([0, notch])
-                    rotate([0, 0, 90])
-                        box_joints(notch, d);
-                translate([-d, 0])
-                    square([d, case_height]);
-            }
-    }
+    translate([width, case_height])
+        mirror([1, 0, 0])
+            mirror([0, 1, 0]) 
+                north_plate();
 }
 
 module east_plate() {
     union() {
         difference() {
             square([case_height, height]);
-            translate([-width+bottom_gap, 0])
-                bottom_plate_east_joints();
+            translate([bottom_gap, buffer])
+               box_joints(height - 2*buffer, true);
         }
-        intersection() {
-            translate([0, height])
-                box_joints(notch, d);
-            translate([0, height])
-                square([case_height, d]);
-        }
+        translate([0, height])
+            box_joints(case_height, false);
         translate([0, -d])
-            intersection() {
-                translate([-ceil(case_height / notch)*notch + (case_height % (2*notch)) - notch, 0])
-                    box_joints(notch, d);
-                translate([0, 0])
-                    square([case_height, d]);
+            difference() {
+                square([case_height, d]);
+                box_joints(case_height, false);
             }
+
     }
 }
 
 module west_plate() {
-    union() {
-        difference() {
-            square([case_height, height]);
-            translate([case_height-bottom_gap, 0])
-                bottom_plate_west_joints();
-        }
-        intersection() {
-            translate([-ceil(case_height / notch)*notch + (case_height % (2*notch)), height])
-                box_joints(notch, d);
-            translate([0, height])
-                square([case_height, d]);
-        }
-        translate([0, -d])
-            intersection() {
-                translate([notch, 0])
-                    box_joints(notch, d);
-                translate([0, 0])
-                    square([case_height, d]);
-            }
-    }
+    translate([case_height, height])
+        mirror([0, 1, 0])
+            mirror([1, 0, 0]) 
+                east_plate();
 }
 
 
