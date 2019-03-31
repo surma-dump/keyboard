@@ -130,13 +130,67 @@ module reset_cutout() {
         cube([reset_width + d, reset_height, d]);
 }
 
-difference() {
-    union() {
-        north_plate();
-        east_plate();
-        south_plate();
-        west_plate();
-        bottom_plate();
+module show_case() {
+    difference() {
+        union() {
+            north_plate();
+            east_plate();
+            south_plate();
+            west_plate();
+            bottom_plate();
+        }
+        usb_cutout();
     }
-    usb_cutout();
 }
+
+module project_bottom_plate() {
+    projection(false)
+        difference() {
+            bottom_plate();
+            usb_cutout();
+        }
+}
+
+module project_north_plate() {
+    projection(false)
+        rotate([-90, 0, 0])
+            difference() {
+                north_plate();
+                usb_cutout();
+            }
+}
+
+module project_south_plate() {
+    projection(false)
+        rotate([-90, 0, 0])
+            south_plate();
+}
+
+module project_east_plate() {
+    rotate([0, 0, 90])
+        projection(false)
+            rotate([0, 90, 0])
+                east_plate();
+}
+
+module project_west_plate() {
+    rotate([0, 0, 90])
+        projection(false)
+            rotate([0, 90, 0])
+                west_plate();
+}
+
+module pieces() {
+    project_bottom_plate();
+    translate([0, -case_height - 2*d])
+        project_north_plate();
+    translate([height + 2*d, 3 * (-case_height - 2*d)])
+        project_east_plate();
+    translate([0, 2 * (-case_height - 2*d)])
+        project_south_plate();
+    translate([2 * (height + 3*d), 3 * (-case_height - 2*d)])
+    project_west_plate();
+}
+
+pieces();
+// show_case();
