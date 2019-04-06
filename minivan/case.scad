@@ -5,6 +5,7 @@ height = 77.75;
 d = 3;
 // Lenght of a notch
 notch = 5;
+notch_offset = 0;
 // Gab between ground and bottom plate
 bottom_gap = d;
 // Height of the case
@@ -64,7 +65,7 @@ module notch_line(origin, dir, d, notch, length, inverted = false) {
                 if(inverted)
                     cube(d * ([1, 1, 1] - dir) + dir * length);
                 for(i = [0:floor(length/(2*notch))]) {
-                    translate(dir * 2*notch*i)
+                    translate(dir * (2*notch*i + -2*notch + notch_offset))
                         cube(dir * notch + ([1, 1, 1] - dir) * d);
                 }
             }
@@ -180,17 +181,17 @@ module project_west_plate() {
                 west_plate();
 }
 
-module pieces() {
+module pieces(gap) {
     project_bottom_plate();
-    translate([0, -case_height - 2*d])
+    translate([0, -case_height - gap])
         project_north_plate();
-    translate([height + 2*d, 3 * (-case_height - 2*d)])
+    translate([height + 2*d, 3 * (-case_height - gap)])
         project_east_plate();
-    translate([0, 2 * (-case_height - 2*d)])
+    translate([0, 2*(-case_height - gap)])
         project_south_plate();
-    translate([2 * (height + 3*d), 3 * (-case_height - 2*d)])
-    project_west_plate();
+    translate([2 * (height + 2*d) + gap, 3 * (-case_height - gap)])
+        project_west_plate();
 }
 
-pieces();
+pieces(d);
 // show_case();
