@@ -14,7 +14,7 @@ case_height = 19 + bottom_gap;
 // MiniUSB receptacle
 // Pure measurements of the receptacle
 miniusb_rec_width = 7.7;
-miniusb_rec_height = 8.45;
+miniusb_rec_height = 11.45;
 miniusb_rec_depth = 5.7;
 // Space buffer on each side
 miniusb_buffer = 2;
@@ -23,15 +23,15 @@ miniusb_height = miniusb_rec_height + miniusb_buffer;
 
 // Crystal
 crystal_width = 13 + 2;
-crystal_height = 5 + 1;
+crystal_height = 5 + 2;
 crystal_top_y = 0;
-crystal_left_x = width/2 - crystal_width + 2;
+crystal_left_x = width/2 - crystal_width ;
 
 // Reset
 reset_width = 7;
 reset_height = 7;
 reset_left_x = 0;
-reset_top_y = height - 48.3;
+reset_top_y = height - 54.3;
 
 // Positions
 miniusb_center_x = width - 30.4;
